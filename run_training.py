@@ -33,7 +33,7 @@ _valid_configs = [
 
 #----------------------------------------------------------------------------
 
-def run(dataset, data_dir, result_dir, config_id, num_gpus, total_kimg, gamma, mirror_augment, metrics):
+def run(dataset, data_dir, result_dir, config_id, num_gpus, total_kimg, gamma, mirror_augment, metrics, resume_pkl):
     train     = EasyDict(run_func_name='training.training_loop.training_loop') # Options for training loop.
     G         = EasyDict(func_name='training.networks_stylegan2.G_main')       # Options for generator network.
     D         = EasyDict(func_name='training.networks_stylegan2.D_stylegan2')  # Options for discriminator network.
@@ -50,6 +50,7 @@ def run(dataset, data_dir, result_dir, config_id, num_gpus, total_kimg, gamma, m
     train.total_kimg = total_kimg
     train.mirror_augment = mirror_augment
     train.image_snapshot_ticks = train.network_snapshot_ticks = 10
+    train.resume_pkl = resume_pkl
     sched.G_lrate_base = sched.D_lrate_base = 0.002
     sched.minibatch_size_base = 32
     sched.minibatch_gpu_base = 4
@@ -163,6 +164,7 @@ def main():
     parser.add_argument('--data-dir', help='Dataset root directory', required=True)
     parser.add_argument('--dataset', help='Training dataset', required=True)
     parser.add_argument('--config', help='Training config (default: %(default)s)', default='config-f', required=True, dest='config_id', metavar='CONFIG')
+    parser.add_argument('--resume-pkl', help='Resume from trained model')
     parser.add_argument('--num-gpus', help='Number of GPUs (default: %(default)s)', default=1, type=int, metavar='N')
     parser.add_argument('--total-kimg', help='Training length in thousands of images (default: %(default)s)', metavar='KIMG', default=25000, type=int)
     parser.add_argument('--gamma', help='R1 regularization weight (default is config dependent)', default=None, type=float)
